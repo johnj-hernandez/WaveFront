@@ -1,15 +1,7 @@
 import numpy as np
 
-#IDEA PRINCIPAL DEL ALGORITMO, NODO FINAL REVISA HACIA DONDE SE PUEDE MOVER TENIENDO EL VECTOR DE
-#POSIBILIDADES ARROJADO POR LA PERCEPCION
-#UNA VEZ LO RECIBA PARA ESOS LUGARES EN LOS QUE SE PUEDE MOVER VA A ASIGNAR UN VALOR +1 DEL QUE TIENE
-#CON UN METODO QUE RECIBA EL PUNTO ACTUAL Y EL VECTOR DE POSBILIDADES,
-#DONDE SEA TRUE SE VA A AUMENTAR EL VALOR´+1 Y SE LLAMARA AL METODO ACTUAL NUEVAMENTE PASANDOLE EL NUEVO PUNTO Y EL VECTOR POSIBILIDADES
-#E INTERNAMENTE A ESOS NUEVOS NODOS TAMBIEN SE LES VA A APLICAR 
-
-
 #Este metodo me va a retornar cuales son las posiciones a las que me puedo mover desde ese punto
-def perception(row,col,matrix):
+def perception(matrix,row,col):
     #first position stands for the possibility of moving up
     #Second for down, third position for left and fourth for right
     array=np.array([False,False,False,False])
@@ -24,10 +16,6 @@ def perception(row,col,matrix):
     down=row+1
     left=col-1
     right=col+1
-    
-
-    ####################TAMPOCO DEBERIA PODERSE SI YA HAY UN VALOR ASIGNADO ES DECIR SOLO TRUE CUANDO SEA 0
-    #Y EVITO ´PONER LA CONDICION DEL MENOS1
     #Checks if  moving up will cause overflowing if not he will check if there is an obstacle
     #if no obstacle is found it'll make the  movement posible
     if(up>=superiorBorder): #Check for overflowing
@@ -47,14 +35,52 @@ def perception(row,col,matrix):
             array[3]=True
     return array
 
+def updateMatrix(matrix,row,col):
+    perceptionArray=perception(matrix,row,col)
+    #The 4 directions we can go
+    up=row-1
+    down=row+1
+    left=col-1
+    right=col+1
+
+    #a counter to check if a movement is possible
+    count=0
+
+
+    #If possible,the value of the direction square will update with the current value of our square +1
+    #moving up
+    if(perceptionArray[0]):
+        matrix[up][col]=matrix[row][col]+1
+        count+=1
+    #moving down
+    if(perceptionArray[1]):
+        matrix[down][col]=matrix[row][col]+1
+        count+=1
+    #Moving left
+    if(perceptionArray[2]):
+        matrix[row][left]=matrix[row][col]+1
+        count+=1
+    #Moving right:
+    if(perceptionArray[3]):
+        matrix[row][right]=matrix[row][col]+1
+        count+=1
+
+    #podria retornar los valores a los que fue posible moverme y en otro metodo aplicar nuevamente este metodo
+    #si el metodo retorna null el algoritmo termina no olvidar EL CASO BASE
+    if(count>1):
+        return True
+    else:
+        return False
+
+
 
 
 
 nrows=int(input("type the number of row: "))
 ncols=int(input("type the numbers of columns: "))
 matriz=np.zeros((nrows,ncols))
-print(type(matriz))
-print((matriz.shape)[0])
+#print(type(matriz))
+#print((matriz.shape)[0])
 
 print("------Obstacles Allocation---------")
 obstacle=True
@@ -74,5 +100,6 @@ print("------End point------")
 rowE=int(input("row of End point----->"))
 colE=int(input("col of End point----->"))
 matriz[rowE][colE]=1
+print(perception(matriz,rowE,colE))
+updateMatrix(matriz,rowE,colE)
 print(matriz)
-print(perception(0,0,matriz))
