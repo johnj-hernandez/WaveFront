@@ -1,25 +1,25 @@
 import numpy as np
 
-#Este metodo me va a retornar cuales son las posiciones a las que me puedo mover desde ese punto
+#This function returns a vector refering to the possible directions the agent can move
 def perception(matrix,row,col):
     #first position stands for the possibility of moving up
     #Second for down, third position for left and fourth for right
     array=np.array([False,False,False,False])
-    #the maximun potitions of the matrix
+    #the maximun positions of the matrix
     superiorBorder=0
-    inferiorBorder=((matrix.shape)[1])-1
+    inferiorBorder=((matrix.shape)[0])-1
     leftBorder=0
-    rightBorder=((matrix.shape)[0])-1
+    rightBorder=((matrix.shape)[1])-1
     
     #The 4 directions we can go
     up=row-1
     down=row+1
     left=col-1
     right=col+1
-    #Checks if  moving up will cause overflowing if not he will check if there is an obstacle
-    #if no obstacle is found it'll make the  movement posible
-    if(up>=superiorBorder): #Check for overflowing
-        if(matrix[up][col]==0): #Check for obstacle
+    #Checks if  moving up will cause an IndexOutOfBound Exception if not ,he will check if there is an obstacle
+    #if no obstacle is found it'll make the  movement possible
+    if(up>=superiorBorder): #Checks for IndexOutOfBound Exception
+        if(matrix[up][col]==0): #Checks for obstacle
             array[0]=True
 
     if(down<=inferiorBorder): 
@@ -42,45 +42,46 @@ def updateMatrix(matrix,row,col):
     down=row+1
     left=col-1
     right=col+1
+    list=[]
 
-    #a counter to check if a movement is possible
-    count=0
-
-
-    #If possible,the value of the direction square will update with the current value of our square +1
+    #If possible,the value of the direction we're gonna move will update with the current value of our square +1
     #moving up
     if(perceptionArray[0]):
         matrix[up][col]=matrix[row][col]+1
-        count+=1
+        list.append(up)
+        list.append(col)
     #moving down
     if(perceptionArray[1]):
         matrix[down][col]=matrix[row][col]+1
-        count+=1
+        list.append(down)
+        list.append(col)
     #Moving left
     if(perceptionArray[2]):
         matrix[row][left]=matrix[row][col]+1
-        count+=1
+        list.append(row)
+        list.append(left)
     #Moving right:
     if(perceptionArray[3]):
         matrix[row][right]=matrix[row][col]+1
-        count+=1
+        list.append(row)
+        list.append(right)
 
-    #podria retornar los valores a los que fue posible moverme y en otro metodo aplicar nuevamente este metodo
-    #si el metodo retorna null el algoritmo termina no olvidar EL CASO BASE
-    if(count>1):
-        return True
-    else:
-        return False
+    #the list return the coordinates of the squares we can move to
+    return list
 
-
-
+def completeCoefficientsMatrix(matriz,rowGoal,colGoal):
+    nuevosPunto=updateMatrix(matriz,rowGoal,colGoal)
+    while(len(nuevosPunto)>0):
+        row=nuevosPunto.pop(0)
+        col=nuevosPunto.pop(0)
+        #se intenta hacer una cola de manera que se de prioridad a los puntos mas prontos a evaluar
+        #y la cola se ira reduciendo expulsando el metodo pop, al tener longitud 0 significa que todos los puntos han sido tratados
+        nuevosPunto.extend(updateMatrix(matriz,row,col))
 
 
 nrows=int(input("type the number of row: "))
 ncols=int(input("type the numbers of columns: "))
 matriz=np.zeros((nrows,ncols))
-#print(type(matriz))
-#print((matriz.shape)[0])
 
 print("------Obstacles Allocation---------")
 obstacle=True
@@ -100,6 +101,5 @@ print("------End point------")
 rowE=int(input("row of End point----->"))
 colE=int(input("col of End point----->"))
 matriz[rowE][colE]=1
-print(perception(matriz,rowE,colE))
-updateMatrix(matriz,rowE,colE)
+completeCoefficientsMatrix(matriz,rowE,colE)
 print(matriz)
