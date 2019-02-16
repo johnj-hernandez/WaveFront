@@ -78,6 +78,53 @@ def completeCoefficientsMatrix(matriz,rowGoal,colGoal):
         #y la cola se ira reduciendo expulsando el metodo pop, al tener longitud 0 significa que todos los puntos han sido tratados
         nuevosPunto.extend(updateMatrix(matriz,row,col))
 
+def waveFront(matrix,startingRow,StartingCol,EndingRow,EndingCol):
+    completeCoefficientsMatrix(matrix,EndingRow,EndingCol)
+    msj="["+str(startingRow)+"]["+str(StartingCol)+"]"
+    count=matrix[startingRow][StartingCol]
+    # the agent position is at first the starting row and the starting col
+    currentRow=startingRow
+    currentCol=StartingCol
+    #variables for the border of the matrix
+    superiorBorder=0
+    inferiorBorder=((matrix.shape)[0])-1
+    leftBorder=0
+    rightBorder=((matrix.shape)[1])-1
+    
+    while(count!=1):
+        #UP
+        if(currentRow-1 >= superiorBorder):
+            if(matrix[currentRow-1][currentCol]==(matrix[currentRow][currentCol]-1)):
+                currentRow=currentRow-1
+                msj=msj+"--->["+str(currentRow)+"]["+str(currentCol)+"]"
+                count-=1
+                continue
+        #DOWN
+        if(currentRow+1 <=inferiorBorder):
+            if(matrix[currentRow+1][currentCol]==(matrix[currentRow][currentCol]-1)):
+                 currentRow=currentRow+1
+                 msj=msj+"--->["+str(currentRow)+"]["+str(currentCol)+"]"
+                 count-=1
+                 continue
+        #LEFT
+        if(currentCol-1 >=leftBorder):
+            if(matrix[currentRow][currentCol-1]==(matrix[currentRow][currentCol]-1)):
+                 currentCol=currentCol-1
+                 msj=msj+"--->["+str(currentRow)+"]["+str(currentCol)+"]"
+                 count-=1
+
+                 continue
+        #RIGHT
+        if(currentCol+1 <=rightBorder):
+            if(matrix[currentRow][currentCol+1]==(matrix[currentRow][currentCol]-1)):
+                 currentCol=currentCol+1
+                 msj=msj+"--->["+str(currentRow)+"]["+str(currentCol)+"]"
+                 count-=1
+                 continue
+    print(count)
+    print(msj)
+        
+
 
 nrows=int(input("type the number of row: "))
 ncols=int(input("type the numbers of columns: "))
@@ -101,5 +148,4 @@ print("------End point------")
 rowE=int(input("row of End point----->"))
 colE=int(input("col of End point----->"))
 matriz[rowE][colE]=1
-completeCoefficientsMatrix(matriz,rowE,colE)
-print(matriz)
+waveFront(matriz,rowS,colS,rowE,colE)
