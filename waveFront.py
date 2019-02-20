@@ -1,6 +1,6 @@
 import numpy as np
 
-#This function returns a vector refering to the possible directions the agent can move
+#This function returns a vector refering to the possible directions the agent can move(nor obstacle nor out of bounds)
 def perception(matrix,row,col):
     #first position stands for the possibility of moving up
     #Second for down, third position for left and fourth for right
@@ -78,8 +78,12 @@ def completeCoefficientsMatrix(matriz,rowGoal,colGoal):
         #y la cola se ira reduciendo expulsando el metodo pop, al tener longitud 0 significa que todos los puntos han sido tratados
         nuevosPunto.extend(updateMatrix(matriz,row,col))
 
+#This funcion with the matrix and its coefficients already completed, will only be in charge of getting the shortest Path
 def waveFront(matrix,startingRow,StartingCol,EndingRow,EndingCol):
+    print("\n -----Coefficients Matrix-------")
     completeCoefficientsMatrix(matrix,EndingRow,EndingCol)
+    print(matrix)
+
     msj="["+str(startingRow)+"]["+str(StartingCol)+"]"
     count=matrix[startingRow][StartingCol]
     # the agent position is at first the starting row and the starting col
@@ -94,7 +98,7 @@ def waveFront(matrix,startingRow,StartingCol,EndingRow,EndingCol):
     while(count!=1):
         #UP
         if(currentRow-1 >= superiorBorder):
-            if(matrix[currentRow-1][currentCol]==(matrix[currentRow][currentCol]-1)):
+            if(matrix[currentRow-1][currentCol]==(matrix[currentRow][currentCol]-1)): #I could've used the count -1 
                 currentRow=currentRow-1
                 msj=msj+"--->["+str(currentRow)+"]["+str(currentCol)+"]"
                 count-=1
@@ -121,17 +125,28 @@ def waveFront(matrix,startingRow,StartingCol,EndingRow,EndingCol):
                  msj=msj+"--->["+str(currentRow)+"]["+str(currentCol)+"]"
                  count-=1
                  continue
-    print(count)
+    #print(count)
+    print("\n---Shortest Parth from [{},{}] to [{},{}] -----".format(startingRow,StartingCol,EndingRow,EndingCol))
     print(msj)
         
 
 
-nrows=int(input("type the number of row: "))
-ncols=int(input("type the numbers of columns: "))
-matriz=np.zeros((nrows,ncols))
-
 print("------Obstacles Allocation---------")
 obstacle=True
+default=input("do you want to use default matrix dimension(4x5) and obstacles? y/n: ")
+if(default=='y'):
+    obstacle=False
+    nrows=4
+    ncols=5
+    matriz=np.zeros((nrows,ncols))
+    matriz[1,2]=-1
+    matriz[1,3]=-1
+    matriz[2,3]=-1
+    matriz[3,3]=-1
+else:
+    nrows=int(input("type the number of row: "))
+    ncols=int(input("type the numbers of columns: "))
+    matriz=np.zeros((nrows,ncols))
 while(obstacle==True):
     obstacleRow=int(input("type the row of the obstacle: "))
     obstacleCol=int(input("type the column of the obstacle: "))
@@ -140,11 +155,11 @@ while(obstacle==True):
     if(option!="y"):
         obstacle=False
 
-print("------Start point------")
+print("\n------Start point------")
 rowS=int(input("row of start point----->"))
 colS=int(input("col of start point----->"))
 
-print("------End point------")
+print("\n------End point------")
 rowE=int(input("row of End point----->"))
 colE=int(input("col of End point----->"))
 matriz[rowE][colE]=1
